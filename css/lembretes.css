@@ -1,0 +1,91 @@
+/* ==========================================================================
+   LEMBRETES — sino do Início, cartão "Para hoje", lista, interruptor e dias da semana.
+   Sem vermelho: lembrete atrasado não é culpa de ninguém.
+   ========================================================================== */
+
+.topo-acoes { display: flex; align-items: center; gap: 10px; }
+.sino { position: relative; width: 40px; height: 40px; }
+.sino-ponto {
+  position: absolute; top: 9px; right: 10px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--primary); box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* ---------- "Para hoje" no Início ---------- */
+.para-hoje { margin-top: 14px; padding-bottom: 8px; }
+.para-hoje-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  min-height: var(--toque); padding: 8px 0; color: inherit; text-decoration: none;
+  border-top: 1.5px solid var(--line);
+}
+.semana-topo + .para-hoje-item { border-top: 0; }
+.para-hoje-marca {
+  width: 28px; height: 28px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  box-shadow: inset 0 0 0 2px var(--line); color: var(--primary-ink);
+  transition: background var(--rapido), box-shadow var(--rapido);
+}
+.para-hoje-item.feito .para-hoje-marca { background: var(--accent); box-shadow: none; }
+.para-hoje-item.feito .para-hoje-texto b { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.para-hoje-texto { display: grid; gap: 1px; }
+.para-hoje-texto b { font-weight: 600; font-size: 16px; }
+
+/* ---------- tela de lembretes ---------- */
+.lembretes-lista { display: grid; gap: 10px; }
+.linha-lembrete { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; color: inherit; }
+.linha-lembrete.pausado { opacity: .55; }
+.linha-lembrete b { font-weight: 600; font-size: 16px; }
+.sugestao { display: flex; gap: 14px; align-items: flex-start; margin-top: 14px; background: var(--primary-soft); box-shadow: none; }
+.sugestao .selo { flex: none; }
+.sugestao-acoes { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.informe a { color: var(--primary-strong); }
+.folha-lista { display: grid; gap: 10px; margin-top: 18px; }
+
+/* interruptor (liga/desliga) — alvo de toque grande */
+.interruptor {
+  width: 56px; height: 32px; border-radius: var(--r-pill); flex: none; position: relative;
+  background: var(--surface-2); box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: background var(--rapido);
+}
+.interruptor i {
+  position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: transform var(--medio) var(--ease);
+}
+.interruptor[aria-checked="true"] { background: var(--accent); box-shadow: none; }
+.interruptor[aria-checked="true"] i { transform: translateX(24px); }
+
+/* ---------- criar lembrete ---------- */
+.palco-passo > .campo, .palco-passo > .dias-semana { margin-top: 20px; }
+.campo-hora { font-size: 34px; text-align: center; min-height: 72px; font-variant-numeric: tabular-nums; }
+.dias-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.dia-btn {
+  aspect-ratio: 1; border-radius: 50%; font-weight: 700; font-size: 16px;
+  background: var(--surface-2); color: var(--ink-soft);
+  transition: background var(--rapido), color var(--rapido), transform var(--rapido);
+}
+.dia-btn:active { transform: scale(.94); }
+.dia-btn[aria-pressed="true"] { background: var(--primary); color: var(--primary-ink); }
+
+/* ---------- várias pessoas ---------- */
+.pessoas-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.convite-conta { display: flex; gap: 14px; align-items: flex-start; margin-top: 14px; }
+
+/* ---------- conta e consentimento ---------- */
+.conta-abas { margin-top: 4px; }
+.conta-form { display: grid; gap: 6px; }
+.conta-form .pergunta { margin-top: 10px; }
+.conta-erro { color: #B8483A; font-weight: 600; font-size: 15px; margin-top: 6px; }
+.conta-form .btn-bloco { margin-top: 16px; }
+.consentimento { display: grid; gap: 12px; margin-top: 18px; }
+.caixa { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.4; cursor: pointer; }
+.caixa input {
+  appearance: none; -webkit-appearance: none; flex: none; width: 26px; height: 26px; margin-top: 1px;
+  border-radius: 8px; background: var(--surface); box-shadow: inset 0 0 0 2px var(--line);
+  display: grid; place-items: center; transition: background var(--rapido), box-shadow var(--rapido);
+}
+.caixa input:checked { background: var(--primary); box-shadow: none; }
+.caixa input:checked::after { content: ''; width: 7px; height: 13px; border: solid var(--primary-ink); border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+.caixa input:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.caixa--opcional { padding: 12px; border-radius: var(--r-md); background: var(--surface-2); }
+.termo summary { cursor: pointer; font-weight: 600; color: var(--primary-strong); min-height: var(--toque); display: flex; align-items: center; }
+.termo-corpo { font-size: 14px; color: var(--ink-soft); display: grid; gap: 6px; padding-bottom: 8px; }
+.termo-corpo h4 { color: var(--ink); font-size: 15px; margin-top: 10px; }

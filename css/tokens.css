@@ -1,0 +1,115 @@
+/* ==========================================================================
+   TOKENS — todas as cores, raios e sombras do app moram aqui.
+   Trocar a cara do app = mexer SÓ neste arquivo.
+   Cada tema é um bloco [data-tema="..."]. O tema ativo fica no <html>.
+   ========================================================================== */
+
+:root {
+  /* tipografia */
+  --fonte-titulo: "Fraunces", "Georgia", serif;
+  --fonte-texto: "Figtree", -apple-system, "Segoe UI", system-ui, sans-serif;
+
+  /* forma */
+  --r-xl: 28px;
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 12px;
+  --r-pill: 999px;
+
+  /* ritmo */
+  --gutter: 20px;
+  --toque: 48px; /* alvo mínimo de toque */
+
+  /* movimento — calmo de propósito (público sensível a estímulo) */
+  --ease: cubic-bezier(.22, .8, .24, 1);
+  --rapido: 160ms;
+  --medio: 280ms;
+}
+
+/* ---------- Tema 1: CADERNO (acolhedor quente) ---------- */
+:root,
+[data-tema="caderno"] {
+  --bg: #FBF7F2;
+  --surface: #FFFFFF;
+  --surface-2: #F4EDE4;
+  --ink: #2F2A26;
+  --ink-soft: #6E645C;
+  --ink-faint: #A89C91;
+  --line: #EADFD3;
+
+  --primary: #C96A4B;
+  --primary-strong: #A9502F;
+  --primary-ink: #FFFFFF;
+  --primary-soft: #F6E0D6;
+
+  --accent: #7F9C7A;
+  --accent-soft: #E2EBDE;
+
+  --t-sessao: #C96A4B;
+  --t-consulta: #6F8FB5;
+  --t-remedio: #C3933A;
+  --t-escola: #7F9C7A;
+  --t-casa: #B07E9C;
+  --t-documento: #8C7B6B;
+
+  --sombra: 0 1px 2px rgba(60, 40, 25, .05), 0 10px 30px -12px rgba(60, 40, 25, .14);
+  --sombra-forte: 0 18px 50px -18px rgba(60, 40, 25, .35);
+}
+
+/* ---------- Tema 2: LAVANDA (calmo) ---------- */
+[data-tema="lavanda"] {
+  --bg: #F6F4FB;
+  --surface: #FFFFFF;
+  --surface-2: #EDE9F8;
+  --ink: #26233A;
+  --ink-soft: #625E7A;
+  --ink-faint: #A29EBA;
+  --line: #E1DCF0;
+
+  --primary: #6F61D0;
+  --primary-strong: #5646BF;
+  --primary-ink: #FFFFFF;
+  --primary-soft: #E6E2FA;
+
+  --accent: #E8997A;
+  --accent-soft: #FCE8DF;
+
+  --t-sessao: #6F61D0;
+  --t-consulta: #4E92CF;
+  --t-remedio: #D9954F;
+  --t-escola: #4FA893;
+  --t-casa: #DB7F9C;
+  --t-documento: #8A86A3;
+
+  --sombra: 0 1px 2px rgba(38, 35, 58, .05), 0 10px 30px -12px rgba(60, 50, 120, .18);
+  --sombra-forte: 0 18px 50px -18px rgba(60, 50, 120, .4);
+}
+
+/* ---------- Tema 3: SOL (sol e céu) ---------- */
+[data-tema="sol"] {
+  --bg: #FFFDF5;
+  --surface: #FFFFFF;
+  --surface-2: #FFF3D1;
+  --ink: #1F2A36;
+  --ink-soft: #566374;
+  --ink-faint: #9AA5B2;
+  --line: #EFE6CA;
+
+  --primary: #F2B33D;
+  --primary-strong: #2F6FA8;
+  --primary-ink: #1F2A36;
+  --primary-soft: #FFEDC2;
+
+  --accent: #5E9FD6;
+  --accent-soft: #E0EEFA;
+
+  --t-sessao: #E39A2C;
+  --t-consulta: #5E9FD6;
+  --t-remedio: #E57A5A;
+  --t-escola: #4FAE80;
+  --t-casa: #A884D6;
+  --t-documento: #7C8896;
+
+  --sombra: 0 1px 2px rgba(31, 42, 54, .05), 0 10px 30px -12px rgba(31, 42, 54, .14);
+  --sombra-forte: 0 18px 50px -18px rgba(31, 42, 54, .35);
+}

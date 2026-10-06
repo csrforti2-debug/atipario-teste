@@ -1,0 +1,13 @@
+{
+  "name": "atipario",
+  "short_name": "atipario",
+  "description": "O caminho de quem é atípico, registrado com poucos toques.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FBF7F2",
+  "theme_color": "#FBF7F2",
+  "icons": [
+    { "src": "assets/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
