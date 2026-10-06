@@ -1,0 +1,106 @@
+/* ==========================================================================
+   FUNÇÕES — uma forma e uma cor para cada TIPO de elemento, para ninguém precisar
+   "ler" a tela inteira para saber o que é botão, o que é navegação e o que é aviso.
+   As cores são as mesmas dos temas; só mudou onde cada uma aparece.
+
+   COR = FUNÇÃO (vale nos 3 temas)
+     terracota  registrar o dia                (--f-registrar)
+     dourado    lembretes e avisos de horário  (--f-lembretes)
+     azul       relatório e envio              (--f-relatorio)
+     verde      conta, privacidade, dados      (--f-conta)
+     lilás      consulta de remédios           (--f-remedios)
+
+   FORMA = TIPO
+     botão cheio .......... a ação principal da tela (cria, salva, envia)
+     botão com contorno ... ação secundária (tem texto e contorno na cor da marca)
+     chip ................. escolha de filtro ou marcação (cinza, sem contorno; marcado = cor da marca)
+     seletor de pessoa .... barra com trilho; a pessoa ativa fica escura
+     linha de navegação ... contorno fino + ícone SOLIDO colorido + seta (leva a outra tela)
+     cartão ............... conteúdo (sombra suave, fundo branco)
+     aviso (callout) ...... faixa lateral colorida + ícone; só informa, não é clicável
+   ========================================================================== */
+
+:root {
+  --f-registrar: var(--primary);
+  --f-lembretes: var(--t-remedio);
+  --f-relatorio: var(--t-consulta);
+  --f-conta: var(--accent);
+  --f-remedios: var(--t-casa);
+}
+
+/* ---------- botões: cheio × contorno × texto ---------- */
+.btn-primario { font-weight: 700; }
+.btn-secundario {
+  background: var(--surface); color: var(--primary-strong);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+.btn-fantasma { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; }
+.btn-fantasma:hover { text-decoration-color: currentColor; }
+.btn-perigo-contorno { background: var(--surface); color: #B8483A; box-shadow: inset 0 0 0 2px #B8483A; }
+
+/* ---------- chips: escolha, não ação ---------- */
+.chip { background: var(--surface-2); box-shadow: none; font-weight: 500; }
+.chip[aria-pressed="true"] { background: var(--primary-soft); color: var(--primary-strong); font-weight: 700; box-shadow: inset 0 0 0 2px var(--primary); }
+
+/* ---------- seletor de pessoa: trilho com a pessoa ativa escura ---------- */
+.pessoas-chips {
+  display: flex; gap: 4px; padding: 4px; margin: 14px 0 4px;
+  background: var(--surface-2); border-radius: var(--r-pill); box-shadow: inset 0 0 0 1.5px var(--line);
+}
+.pessoas-chips .chip { flex: 1; justify-content: center; min-height: 44px; background: transparent; box-shadow: none; color: var(--ink-soft); font-weight: 600; }
+.pessoas-chips .chip::before { display: none; }
+.pessoas-chips .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .5); }
+
+/* ---------- linha de navegação: leva a outra tela ---------- */
+.cartao.chamada {
+  background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line);
+  padding: 12px 16px 12px 12px; gap: 14px; border-radius: var(--r-lg);
+  transition: transform var(--rapido) var(--ease), box-shadow var(--rapido);
+}
+.cartao.chamada:active { transform: scale(.985); }
+.cartao.chamada .selo {
+  width: 48px; height: 48px; border-radius: 15px;
+  background: color-mix(in srgb, var(--cor) 84%, #000); color: #fff;
+}
+.cartao.chamada > span:nth-child(2) b { font-size: 17px; }
+.cartao.chamada > .icone:last-child { color: var(--cor); }
+.cartao.chamada + .cartao.chamada { margin-top: 10px; }
+
+/* ---------- avisos: informam, não são clicáveis ---------- */
+.callout {
+  --cor: var(--accent);
+  background: color-mix(in srgb, var(--cor) 11%, var(--surface));
+  box-shadow: inset 5px 0 0 var(--cor);
+  border-radius: var(--r-md); padding: 14px 16px 14px 20px;
+}
+.callout--info { --cor: var(--f-relatorio); }
+.callout--aviso { --cor: var(--f-lembretes); }
+.callout--privacidade { --cor: var(--f-conta); }
+.callout--marca { --cor: var(--primary); }
+.callout .callout-titulo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; margin-bottom: 6px; color: color-mix(in srgb, var(--cor) 55%, var(--ink)); }
+.nota-privacidade { background: color-mix(in srgb, var(--f-conta) 11%, var(--surface)); box-shadow: inset 5px 0 0 var(--f-conta); padding-left: 20px; }
+.sugestao { background: color-mix(in srgb, var(--primary) 11%, var(--surface)); box-shadow: inset 5px 0 0 var(--primary); }
+.convite-conta { background: color-mix(in srgb, var(--f-conta) 11%, var(--surface)); box-shadow: inset 5px 0 0 var(--f-conta); }
+
+/* ---------- início: cada cartão com o seu papel ---------- */
+.checkin { background: var(--primary-soft); box-shadow: none; }
+.checkin h2 { color: var(--primary-strong); }
+.checkin .rosto-btn { background: var(--surface); }
+.hoje-feito { box-shadow: inset 5px 0 0 var(--primary), var(--sombra); }
+.para-hoje { box-shadow: inset 5px 0 0 var(--f-lembretes), var(--sombra); }
+.para-hoje .semana-topo b { display: inline-flex; align-items: center; gap: 8px; color: color-mix(in srgb, var(--f-lembretes) 55%, var(--ink)); }
+.para-hoje-marca { box-shadow: inset 0 0 0 2px var(--f-lembretes); }
+.para-hoje-item.feito .para-hoje-marca { background: var(--f-lembretes); }
+.semana { box-shadow: var(--sombra); } /* neutro de propósito: só informa */
+
+/* sino (lembretes) e avatar (perfil) deixam de parecer o mesmo botão */
+.sino { background: color-mix(in srgb, var(--f-lembretes) 20%, var(--surface)); color: color-mix(in srgb, var(--f-lembretes) 50%, #000); box-shadow: none; }
+.sino-ponto { background: var(--f-lembretes); }
+
+/* ---------- títulos de seção ---------- */
+.secao-titulo::before { content: ''; width: 8px; height: 8px; border-radius: 3px; background: var(--cor, var(--ink-faint)); margin-right: 8px; flex: none; align-self: center; }
+.secao-titulo { justify-content: flex-start; }
+.secao-titulo > :last-child:not(:first-child) { margin-left: auto; }
+
+/* ---------- lista de lembretes e de pessoas: linha de conteúdo (ícone claro, sem contorno) ---------- */
+.linha-lembrete .selo { border-radius: 50%; }

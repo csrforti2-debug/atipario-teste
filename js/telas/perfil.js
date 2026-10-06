@@ -26,7 +26,7 @@ export function render(el, ctx) {
     </div>
 
     <section class="secao">
-      <div class="secao-titulo">Pessoas que você acompanha</div>
+      <div class="secao-titulo" style="--cor:var(--primary)">Pessoas que você acompanha</div>
       <div class="lembretes-lista">
         ${pessoas.map(p => `
           <button class="cartao linha-lembrete" data-pessoa-editar="${p.id}">
@@ -41,9 +41,9 @@ export function render(el, ctx) {
 
     ${conta.situacao.disponivel ? `
     <section class="secao">
-      <div class="secao-titulo">Conta</div>
+      <div class="secao-titulo" style="--cor:var(--f-conta)">Conta</div>
       <a class="cartao chamada" href="#/conta${conta.situacao.logado ? '' : '?modo=criar'}" style="margin-top:0">
-        <span class="selo" style="--cor:var(--accent)">${icone('cadeado', 22)}</span>
+        <span class="selo" style="--cor:var(--f-conta)">${icone('cadeado', 24)}</span>
         <span><b>${conta.situacao.logado ? 'Sua conta' : 'Criar conta ou entrar'}</b>
           <span class="suave pequeno">${conta.situacao.logado ? esc(conta.situacao.email) : 'Opcional. Guarda uma cópia e leva seus registros para outro aparelho.'}</span></span>
         ${icone('seta', 20, 'fraco')}
@@ -51,14 +51,14 @@ export function render(el, ctx) {
     </section>` : ''}
 
     <section class="secao">
-      <div class="secao-titulo">Lembretes e consulta</div>
+      <div class="secao-titulo" style="--cor:var(--f-lembretes)">Lembretes e consulta</div>
       <a class="cartao chamada" href="#/lembretes" style="margin-top:0">
-        <span class="selo" style="--cor:var(--primary)">${icone('sino', 22)}</span>
+        <span class="selo" style="--cor:var(--f-lembretes)">${icone('sino', 24)}</span>
         <span><b>Lembretes e avisos</b><span class="suave pequeno">Remédio, atividades e retornos que você combinou</span></span>
         ${icone('seta', 20, 'fraco')}
       </a>
       <a class="cartao chamada" href="#/remedios">
-        <span class="selo" style="--cor:var(--t-remedio)">${icone('remedio', 22)}</span>
+        <span class="selo" style="--cor:var(--f-remedios)">${icone('remedio', 24)}</span>
         <span><b>Consultar um remédio</b><span class="suave pequeno">Informações de fonte oficial, para conversar com a equipe</span></span>
         ${icone('seta', 20, 'fraco')}
       </a>
@@ -75,14 +75,14 @@ export function render(el, ctx) {
     </section>
 
     <section class="secao">
-      <div class="secao-titulo">Seus dados</div>
+      <div class="secao-titulo" style="--cor:var(--f-conta)">Seus dados</div>
       <p class="nota-privacidade">${icone('cadeado', 20)}
         <span>${conta.situacao.logado
           ? 'Seus registros ficam neste aparelho e uma cópia, sem as fotos, fica na sua conta. Nada mais sai daqui, a não ser o relatório que você escolher mandar.'
           : 'Tudo o que você registra fica só neste aparelho. Nada vai para a internet, a não ser o relatório que você mesma(o) escolher mandar.'}</span></p>
       <div class="cartao" style="margin-top:12px;padding:4px 18px">
         <div class="linha-config"><span>Carregar dados de exemplo</span><button class="btn btn-secundario" data-exemplo>Carregar</button></div>
-        <div class="linha-config"><span>Recomeçar do zero</span><button class="btn btn-fantasma" data-zerar style="color:#B8483A">Apagar tudo</button></div>
+        <div class="linha-config"><span>Recomeçar do zero</span><button class="btn btn-perigo-contorno" data-zerar>Apagar tudo</button></div>
       </div>
     </section>
   </div>`;

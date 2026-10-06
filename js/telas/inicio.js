@@ -76,7 +76,7 @@ export function render(el, ctx) {
 
     ${paraHoje.length || proximos.length ? `
     <section class="cartao para-hoje" aria-label="Lembretes de hoje">
-      <div class="semana-topo"><b>Para hoje</b><a class="suave pequeno" href="#/lembretes">ver todos</a></div>
+      <div class="semana-topo"><b>${icone('sino', 18)} Para hoje</b><a class="suave pequeno" href="#/lembretes">ver todos</a></div>
       ${paraHoje.map(l => `
         <button class="para-hoje-item ${feito(l, hoje) ? 'feito' : ''}" data-lem="${l.id}" aria-pressed="${feito(l, hoje)}">
           <span class="para-hoje-marca">${feito(l, hoje) ? icone('check', 16) : ''}</span>
@@ -105,7 +105,7 @@ export function render(el, ctx) {
     </div>` : ''}
 
     <a class="cartao chamada" href="#/relatorio">
-      <span class="selo" style="--cor:var(--primary)">${icone('enviar', 22)}</span>
+      <span class="selo" style="--cor:var(--f-relatorio)">${icone('enviar', 24)}</span>
       <span><b>Mandar resumo para a equipe</b><span class="suave pequeno">Pronto para o WhatsApp ou PDF</span></span>
       ${icone('seta', 20, 'fraco')}
     </a>

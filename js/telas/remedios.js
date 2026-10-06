@@ -26,7 +26,7 @@ export function render(el, ctx) {
     <p class="suave">Informações de fonte oficial, para você conversar com o médico ou o farmacêutico. Aqui não tem dose, horário nem indicação de trocar ou parar remédio.</p>
 
     <section class="secao" style="margin-top:20px">
-      <div class="secao-titulo">Qual remédio?</div>
+      <div class="secao-titulo" style="--cor:var(--f-remedios)">Qual remédio?</div>
       <div class="chips">
         ${MEDICAMENTOS.map(m => `<button class="chip" data-a="${m.id}" aria-pressed="${escolhaA === m.id}">${esc(m.nome)}</button>`).join('')}
       </div>
@@ -51,8 +51,8 @@ export function render(el, ctx) {
     </section>` : ''}
 
     <section class="secao">
-      <div class="cartao informe">
-        <p class="pequeno"><b>Leia antes de usar esta consulta</b></p>
+      <div class="callout callout--aviso informe">
+        <div class="callout-titulo">${icone('cadeado', 18)} Leia antes de usar esta consulta</div>
         <ul class="pequeno" style="padding-left:18px;margin-top:6px;display:grid;gap:6px">
           <li>É informação para consulta, não orientação. Nunca mude dose, horário ou pare um remédio sem falar com quem receitou.</li>
           <li>A base tem poucos remédios. Não aparecer aqui <b>não</b> quer dizer que seja seguro.</li>

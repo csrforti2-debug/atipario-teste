@@ -61,7 +61,7 @@ export function render(el, ctx) {
     </div>`}
 
     <section class="secao">
-      <div class="secao-titulo">Check-in do dia${varias ? ' · ' + esc(ativa.nome) : ''}</div>
+      <div class="secao-titulo" style="--cor:var(--f-lembretes)">Check-in do dia${varias ? ' · ' + esc(ativa.nome) : ''}</div>
       ${seletorPessoas()}
       <div class="cartao linha-lembrete">
         <span class="selo" style="--cor:var(--t-casa)">${icone('casa', 22)}</span>
@@ -72,7 +72,7 @@ export function render(el, ctx) {
     </section>
 
     <section class="secao">
-      <div class="secao-titulo">Como os avisos funcionam</div>
+      <div class="secao-titulo" style="--cor:var(--f-lembretes)">Como os avisos funcionam</div>
       <div class="cartao">
         <p class="pequeno"><b>Com o atipario aberto</b>, o aviso aparece na tela
           ${perm === 'granted' ? 'e como notificação neste aparelho.' : 'e, se você permitir, como notificação.'}</p>
@@ -86,8 +86,9 @@ export function render(el, ctx) {
     </section>
 
     <section class="secao">
-      <div class="secao-titulo">Bom saber · autismo</div>
-      <div class="cartao informe">
+      <div class="secao-titulo" style="--cor:var(--f-relatorio)">Bom saber · autismo</div>
+      <div class="callout callout--info informe">
+        <div class="callout-titulo">${icone('documento', 18)} Direito previsto em lei</div>
         <p class="suave pequeno" style="margin-bottom:8px">Vale para quem tem diagnóstico de autismo (TEA). Atípico é mais amplo do que isso, e o app não pede diagnóstico.</p>
         <p class="pequeno"><b>Atendimento multiprofissional é diretriz da política nacional de proteção da pessoa com autismo.</b>
           A Lei 12.764/2012 (art. 2º, III) fala em “atenção integral às necessidades de saúde da pessoa com transtorno do espectro autista”,

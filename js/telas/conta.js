@@ -140,7 +140,7 @@ function renderConta(el, ctx, topo, voltar, redesenhar) {
     </div>
 
     <section class="secao">
-      <div class="secao-titulo">Pesquisa</div>
+      <div class="secao-titulo" style="--cor:var(--f-conta)">Pesquisa</div>
       <div class="cartao linha-lembrete">
         <span style="flex:1"><b>Ajudar a pesquisa do atipario</b>
           <span class="suave pequeno" style="display:block">Uma cópia reduzida e sem identificação: data, tipo de registro, profissional, rostinho e marcações. Sem nome, frases, remédios ou fotos. Ao desligar, a cópia é apagada.</span></span>
@@ -149,7 +149,7 @@ function renderConta(el, ctx, topo, voltar, redesenhar) {
     </section>
 
     <section class="secao">
-      <div class="secao-titulo">Seus dados</div>
+      <div class="secao-titulo" style="--cor:var(--f-conta)">Seus dados</div>
       <div class="cartao" style="padding:4px 18px">
         <div class="linha-config"><span>Baixar tudo que está na conta</span><button class="btn btn-secundario" data-baixar>${icone('baixar', 18)} Baixar</button></div>
         <div class="linha-config"><span>Sair desta conta</span><button class="btn btn-secundario" data-sair>Sair</button></div>
