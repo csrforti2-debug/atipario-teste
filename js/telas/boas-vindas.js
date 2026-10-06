@@ -24,6 +24,9 @@ export function render(el, { ir }) {
     window.scrollTo(0, 0);
     el.innerHTML = `<div class="bv">${atual === 'capa' ? '' : `<div class="bv-progresso">${progresso}</div>`}${PASSOS[atual]()}</div>`;
     el.firstElementChild.classList.add('tela-entra');
+    // O rodapé com os botões é fixo e muda de altura (2 ou 3 botões, textos que quebram): reserva o espaço dele.
+    const rodapeFixo = el.querySelector('.pe-fixo');
+    if (rodapeFixo) el.firstElementChild.style.paddingBottom = `${rodapeFixo.offsetHeight + 16}px`;
     ligar(atual);
   }
 
@@ -47,12 +50,12 @@ export function render(el, { ir }) {
         <h1>Tudo o que acontece, num lugar só.</h1>
         <p class="bv-sub">Terapias, escola, remédios e o dia a dia, registrados em poucos toques.
           Quando precisar, vira um resumo pronto para mandar à equipe.</p>
+        ${conta.situacao.disponivel === false ? '<p class="bv-aviso">Versão de teste. Seus registros ficam só neste aparelho. Se preferir, use nomes de mentira.</p>' : ''}
       </div>
       <div class="pe-fixo">
         <button class="btn btn-primario btn-bloco" data-av>${APP.convite}</button>
         <button class="btn btn-fantasma btn-bloco" data-exemplo>Ver com dados de exemplo</button>
         ${conta.situacao.disponivel === true ? '<button class="btn btn-fantasma btn-bloco" data-conta>Já tenho conta</button>' : ''}
-        ${conta.situacao.disponivel === false ? '<p class="suave pequeno" style="text-align:center;margin-top:6px">Versão de teste. Seus registros ficam só neste aparelho. Se preferir, use nomes de mentira.</p>' : ''}
       </div>`,
 
     relacao: () => `

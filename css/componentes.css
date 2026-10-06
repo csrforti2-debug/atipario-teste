@@ -529,3 +529,6 @@ body.travado { overflow: hidden; }
 .semana-dia.tem i { background: var(--primary); }
 .semana-dia.hoje { color: var(--ink); }
 .semana-dia.hoje i { box-shadow: 0 0 0 2.5px var(--bg), 0 0 0 4.5px var(--primary); }
+
+/* aviso curto na capa (ex.: "Versão de teste"): fica no corpo da tela, nunca atrás dos botões fixos */
+.bv-aviso { font-size: 14px; color: var(--ink-soft); padding: 10px 14px; border-radius: var(--r-md); background: var(--surface-2); }
