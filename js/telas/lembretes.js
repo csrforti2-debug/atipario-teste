@@ -8,6 +8,7 @@ import { icone } from '../icones.js';
 import { esc, toast, abrirFolha, confirmar } from '../ui.js';
 import { curta } from '../datas.js';
 import { abrirLembrete } from '../fluxos/lembrete.js';
+import { conta } from '../conta.js';
 import {
   permissaoNotificacao, pedirPermissao, resumoQuando, tituloLembrete, baixarICS,
   sugestoesDeRetorno, dispensarSugestao, diasAte,
@@ -80,7 +81,11 @@ export function render(el, ctx) {
         ${perm === 'denied' ? `<p class="suave pequeno" style="margin-top:8px">As notificações estão bloqueadas neste navegador. Dá para liberar nas configurações do site.</p>` : ''}
         <p class="pequeno" style="margin-top:12px"><b>Com o app fechado</b>, quem toca é o calendário do celular.
           Toque num lembrete e escolha <i>Pôr no calendário</i>.</p>
-        ${normais.length ? `<button class="btn btn-secundario" style="margin-top:10px" data-todos>${icone('calendario', 18)} Levar todos para o calendário</button>` : ''}
+        ${conta.situacao.logado
+          ? `<button class="btn btn-primario" style="margin-top:10px" data-assinar>${icone('calendario', 18)} Ligar ao calendário do celular</button>
+             <p class="suave pequeno" style="margin-top:6px">Liga uma vez e o calendário acompanha sozinho: lembrete novo, mudado ou apagado aparece lá.</p>`
+          : conta.situacao.disponivel ? `<p class="suave pequeno" style="margin-top:10px">Com uma conta, o calendário do celular se atualiza sozinho.</p>` : ''}
+        ${normais.length ? `<button class="btn btn-secundario" style="margin-top:10px" data-todos>${icone('calendario', 18)} Levar todos para o calendário (uma vez)</button>` : ''}
         <p class="suave pequeno" style="margin-top:12px">${esc(AVISO_LEMBRETES)} O evento vai para o calendário do seu celular, que pode sincronizar com a sua conta.</p>
       </div>
     </section>
@@ -118,6 +123,14 @@ export function render(el, ctx) {
     const r = await pedirPermissao();
     toast(r === 'granted' ? 'Notificações liberadas' : 'Sem notificações; os avisos continuam na tela', r === 'granted' ? 'check' : 'sino');
     redesenhar();
+  });
+  el.querySelector('[data-assinar]')?.addEventListener('click', async () => {
+    const link = await conta.linkCalendario();
+    if (!link) return toast('Não consegui gerar o link agora', 'x');
+    const ehGoogle = /android/i.test(navigator.userAgent);
+    location.href = ehGoogle
+      ? `https://calendar.google.com/calendar/r?cid=${encodeURIComponent('webcal://' + link)}`
+      : `webcal://${link}`;
   });
   el.querySelector('[data-todos]')?.addEventListener('click', () => {
     baixarICS(store.lembretes.filter(l => l.ativo));

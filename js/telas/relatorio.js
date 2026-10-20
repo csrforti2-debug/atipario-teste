@@ -101,14 +101,25 @@ export function render(el, ctx) {
   });
 
   const texto = () => textoWhatsApp({ perfil, pessoa, relacao, porTipo, inicio, media, tend, eu, gatilhos, ajudou });
-  el.querySelector('[data-whats]')?.addEventListener('click', () => {
-    window.open('https://wa.me/?text=' + encodeURIComponent(texto()), '_blank');
-  });
+  el.querySelector('[data-whats]')?.addEventListener('click', () => abrirWhatsApp(texto()));
   el.querySelector('[data-copiar]')?.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(texto()); toast('Texto copiado'); }
     catch { toast('Não consegui copiar', 'x'); }
   });
   el.querySelector('[data-pdf]')?.addEventListener('click', () => window.print());
+}
+
+// Abre o WhatsApp com o texto pronto. No Lovable o app roda dentro de um iframe, e ali o
+// celular costuma barrar a janela nova: então o link abre na página inteira (_top), que no
+// celular passa direto para o app do WhatsApp. Fora do iframe, abre numa aba nova.
+function abrirWhatsApp(texto) {
+  const a = document.createElement('a');
+  a.href = 'https://wa.me/?text=' + encodeURIComponent(texto);
+  a.rel = 'noopener';
+  a.target = window.top !== window.self ? '_top' : '_blank';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 // Agrupa por área (fono, TO...) quando o tipo tem área; senão, junta tudo.

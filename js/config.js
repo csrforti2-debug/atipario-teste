@@ -5,9 +5,14 @@
 export const APP = {
   nome: 'atipario',
   convite: 'Vamos atipicar?',
-  slogan: 'O caminho de quem é atípico, registrado com poucos toques.',
+  slogan: 'Chega de recontar a história. O atipario lembra por você.',
   limiteNota: 140, // de propósito: o app não quer que ninguém escreva textão
 };
+
+// Conta: opcional. Desligada, o app esconde a conta inteira e não chama o servidor.
+export const CONTA_LIGADA = false; // link público de teste: sem conta
+// Fase de teste: mostra o aviso "use nomes de mentira" (até revisar o termo de uso).
+export const FASE_DE_TESTE = true;
 
 // Quem está usando. "eu" = a própria pessoa atípica se acompanhando.
 export const RELACOES = [

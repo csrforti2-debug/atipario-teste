@@ -16,6 +16,8 @@ import * as relatorio from './telas/relatorio.js';
 import * as perfil from './telas/perfil.js';
 import * as lembretes from './telas/lembretes.js';
 import * as contaTela from './telas/conta.js';
+import * as quem from './telas/quem.js';
+import { precisaEscolher } from './pessoas.js';
 import * as remedios from './telas/remedios.js';
 import { conta } from './conta.js';
 import { iniciarAvisos } from './lembretes.js';
@@ -24,6 +26,7 @@ import { toast } from './ui.js';
 // rota → { tela, mostra a barra de navegação? }
 const ROTAS = {
   'boas-vindas': { tela: boasVindas, nav: false },
+  'quem':        { tela: quem,       nav: false },  // com 2+ pessoas: de quem é a vez (abre o app)
   'inicio':      { tela: inicio,     nav: true },
   'historico':   { tela: historico,  nav: true },
   'relatorio':   { tela: relatorio,  nav: true },
@@ -47,11 +50,17 @@ function lerRota() {
 
 let limparAnterior = null;
 let primeira = true;
+// Volta de um link de e-mail (confirmar conta, senha nova): o endereço traz o código de acesso
+// depois do "#". Espera a conta ler esse código antes de usar o "#" para trocar de tela.
+let esperandoEmail = /access_token=|error_description=/.test(location.hash);
 
 function render() {
+  if (esperandoEmail) return;
   const { nome, params } = lerRota();
+  // Conta é opcional: sem perfil, começa pelas boas-vindas.
   if (!store.perfil && nome !== 'boas-vindas' && nome !== 'conta') { ir('boas-vindas'); return; }
   if (!ROTAS[nome]) { ir('inicio'); return; }
+  if (nome === 'inicio' && precisaEscolher()) { ir('quem'); return; }
 
   const el = document.getElementById('tela');
   // Transição: a tela atual some rápido (120 ms) e a nova entra subindo de leve.
@@ -86,12 +95,12 @@ function desenharNav(ativa) {
     <div class="nav-barra">
       ${item('inicio', 'casa', 'Início')}
       ${item('historico', 'linha', 'Histórico')}
-      <button class="nav-mais" aria-label="Novo registro">${icone('mais', 30)}</button>
+      <button class="nav-mais-item" aria-label="Novo registro"><span class="nav-mais">${icone('mais', 30)}</span><span aria-hidden="true">Registrar</span></button>
       ${item('relatorio', 'relatorio', 'Relatório')}
       ${item('perfil', 'perfil', 'Perfil')}
     </div>`;
   // Depois de salvar, fica na mesma tela (a comemoração já confirma), só redesenha.
-  nav.querySelector('.nav-mais').onclick = () => abrirRegistro({ aoSalvar: () => montar(lerRota().nome, {}) });
+  nav.querySelector('.nav-mais-item').onclick = () => abrirRegistro({ aoSalvar: () => montar(lerRota().nome, {}) });
 }
 
 // ---------- abertura: o traço se desenha com a ponta da caneta ----------
@@ -118,7 +127,15 @@ aplicarTema();
 window.addEventListener('hashchange', render);
 abertura();
 render();
-// Pergunta ao servidor se há conta aberta; se trouxer dados novos de outro aparelho, redesenha a tela.
-conta.carregar().then(() => { if (store.perfil && lerRota().nome === 'boas-vindas') ir('inicio'); else if (lerRota().nome === 'inicio') render(); });
+// Pergunta se há conta aberta; se trouxer dados de outro aparelho, redesenha a tela.
+conta.carregar().then(() => {
+  const vinhaDoEmail = esperandoEmail;
+  esperandoEmail = false;
+  const destino = conta.recuperando ? 'conta' : (vinhaDoEmail || (store.perfil && lerRota().nome === 'boas-vindas')) ? (store.perfil ? 'inicio' : 'boas-vindas') : null;
+  if (destino && lerRota().nome !== destino) ir(destino);
+  else if (destino || lerRota().nome === 'inicio') render();
+});
+// Abriu pelo link de senha nova depois de o app já estar aberto.
+conta.aoMudar(() => { if (conta.recuperando && !esperandoEmail && lerRota().nome !== 'conta') ir('conta'); });
 // Avisos de lembrete enquanto o app está aberto (com o app fechado, só o calendário do celular toca).
 iniciarAvisos(texto => { if (store.perfil) toast(texto, 'sino'); });

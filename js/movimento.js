@@ -64,20 +64,23 @@ export async function tracar(botao) {
 }
 
 /** Popup central de comemoração: o logo se desenha e aparece a mensagem. */
-export function celebrar(titulo, sub = '') {
+// acao (opcional): { rotulo, aoTocar } — um botão no cartão; ele fica mais tempo na tela.
+export function celebrar(titulo, sub = '', acao = null) {
   const el = document.createElement('div');
-  el.className = 'celebra';
+  el.className = 'celebra' + (acao ? ' celebra--acao' : '');
   el.setAttribute('role', 'status');
   el.innerHTML = `
     <div class="celebra-cartao">
       ${logoComCaneta({ tamanho: 84, espessura: 6 })}
       <b>${esc(titulo)}</b>${sub ? `<span>${esc(sub)}</span>` : ''}
+      ${acao ? `<button class="btn btn-secundario celebra-acao">${esc(acao.rotulo)}</button>` : ''}
     </div>`;
+  if (acao) el.querySelector('.celebra-acao').onclick = () => { el.remove(); acao.aoTocar(); };
   document.getElementById('camada').appendChild(el);
   requestAnimationFrame(() => el.classList.add('celebra--in'));
   desenharComCaneta(el.querySelector('svg'), 750);
   return new Promise(resolve => setTimeout(() => {
     el.classList.remove('celebra--in');
     setTimeout(() => { el.remove(); resolve(); }, 300);
-  }, movimentoReduzido() ? 900 : 1500));
+  }, acao ? 3200 : movimentoReduzido() ? 900 : 1500));
 }

@@ -7,6 +7,7 @@ import { conta } from '../conta.js';
 import { icone } from '../icones.js';
 import { esc, toast, confirmar } from '../ui.js';
 import { aplicarTema, temaAtual } from '../tema.js';
+import { comecarDoZero } from './inicio.js';
 
 export function render(el, ctx) {
   const perfil = store.perfil;
@@ -81,8 +82,11 @@ export function render(el, ctx) {
           ? 'Seus registros ficam neste aparelho e uma cópia, sem as fotos, fica na sua conta. Nada mais sai daqui, a não ser o relatório que você escolher mandar.'
           : 'Tudo o que você registra fica só neste aparelho. Nada vai para a internet, a não ser o relatório que você mesma(o) escolher mandar.'}</span></p>
       <div class="cartao" style="margin-top:12px;padding:4px 18px">
-        <div class="linha-config"><span>Carregar dados de exemplo</span><button class="btn btn-secundario" data-exemplo>Carregar</button></div>
-        <div class="linha-config"><span>Recomeçar do zero</span><button class="btn btn-perigo-contorno" data-zerar>Apagar tudo</button></div>
+        ${conta.situacao.logado ? '<div class="linha-config"><span>Sair da conta</span><button class="btn btn-secundario" data-sair>Sair</button></div>' : ''}
+        ${store.prefs.exemplo
+          ? '<div class="linha-config"><span>Você está vendo dados de exemplo</span><button class="btn btn-primario" data-do-zero>Começar do zero</button></div>'
+          : `${!store.todosRegistros.length && !conta.situacao.logado ? '<div class="linha-config"><span>Ver o app com dados de exemplo</span><button class="btn btn-secundario" data-exemplo>Ver</button></div>' : ''}
+        <div class="linha-config"><span>Recomeçar do zero</span><button class="btn btn-perigo-contorno" data-zerar>Apagar tudo</button></div>`}
       </div>
     </section>
   </div>`;
@@ -98,15 +102,17 @@ export function render(el, ctx) {
     el.querySelectorAll('[data-tema]').forEach(x => x.setAttribute('aria-pressed', x === b));
   });
 
-  el.querySelector('[data-exemplo]').onclick = async () => {
-    if (await confirmar({ titulo: 'Trocar pelos dados de exemplo?', texto: 'Os seus registros atuais serão substituídos por 6 semanas fictícias (Ana e Theo).', ok: 'Carregar' })) {
-      store.carregarExemplo();
-      toast('Exemplo carregado');
-      ctx.ir('inicio');
+  el.querySelector('[data-do-zero]')?.addEventListener('click', () => comecarDoZero(ctx));
+  el.querySelector('[data-exemplo]')?.addEventListener('click', () => { store.carregarExemplo(); toast('Exemplo carregado'); ctx.ir('inicio'); });
+  el.querySelector('[data-sair]')?.addEventListener('click', async () => {
+    if (await confirmar({ titulo: 'Sair da conta?', texto: 'Seus registros continuam guardados na conta. Neste aparelho, eles saem até você entrar de novo.', ok: 'Sair' })) {
+      await conta.sair();
+      toast('Você saiu da conta');
+      ctx.ir('boas-vindas');
     }
-  };
+  });
 
-  el.querySelector('[data-zerar]').onclick = async () => {
+  if (el.querySelector('[data-zerar]')) el.querySelector('[data-zerar]').onclick = async () => {
     if (await confirmar({ titulo: 'Apagar tudo?', texto: conta.situacao.logado ? 'Perfil e registros saem deste aparelho. A cópia na sua conta continua lá: para apagá-la, exclua a conta. Não dá para desfazer.' : 'Perfil e registros saem deste aparelho. Não dá para desfazer.', ok: 'Apagar tudo', perigo: true })) {
       store.apagarTudo();
       ctx.ir('boas-vindas');

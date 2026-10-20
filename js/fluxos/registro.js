@@ -31,8 +31,13 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
     area: registro?.area || null,
     humor: registro?.humor || humor,
     marcadores: new Set(registro?.marcadores || []),
-    gatilhos: new Set(registro?.gatilhos || []),
-    ajudou: new Set(registro?.ajudou || []),
+    gatilhos: new Set((registro?.gatilhos || []).map(m => m.startsWith('Outro: ') ? 'Outro' : m)),
+    ajudou: new Set((registro?.ajudou || []).map(m => m.startsWith('Outro: ') ? 'Outro' : m)),
+    // "Outro" com texto: guardado como "Outro: <texto>"; sem texto, só "Outro".
+    outro: {
+      gat: (registro?.gatilhos || []).find(m => m.startsWith('Outro: '))?.slice(7) || '',
+      aju: (registro?.ajudou || []).find(m => m.startsWith('Outro: '))?.slice(7) || '',
+    },
     nota: registro?.nota || '',
     foto: registro?.foto || null,
     data: registro?.data || hojeISO(),
@@ -204,6 +209,9 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
       <div class="chips chips--grandes">
         ${lista.map(m => `<button class="chip" data-${atr}="${esc(m)}" aria-pressed="${escolhidos.has(m)}">${esc(m)}</button>`).join('')}
       </div>
+      ${lista.includes('Outro') ? `
+      <input class="campo campo-outro" data-outro-texto maxlength="40" placeholder="Qual?" value="${esc(s.outro[atr])}"
+        aria-label="Qual outro?" ${escolhidos.has('Outro') ? '' : 'hidden'}>` : ''}
       <div class="palco-pe"><button class="btn btn-primario btn-bloco" data-continuar>${escolhidos.size ? 'Continuar' : 'Pular'}</button></div>`;
 
   const ligarChips = (el, escolhidos, atr) => {
@@ -213,9 +221,18 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
       escolhidos.has(m) ? escolhidos.delete(m) : escolhidos.add(m);
       b.setAttribute('aria-pressed', escolhidos.has(m));
       cont.textContent = escolhidos.size ? 'Continuar' : 'Pular';
+      if (m === 'Outro' && campoOutro) {
+        campoOutro.hidden = !escolhidos.has('Outro');
+        if (!campoOutro.hidden) campoOutro.focus();
+      }
     });
+    const campoOutro = el.querySelector('[data-outro-texto]');
+    campoOutro?.addEventListener('input', () => { s.outro[atr] = campoOutro.value; });
+    campoOutro?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); proximo(); } });
     cont.onclick = proximo;
   };
+  const comOutro = (escolhidos, texto) =>
+    [...escolhidos].map(m => (m === 'Outro' && texto.trim() ? `Outro: ${texto.trim()}` : m));
 
   const opcaoArea = a => `
     <button class="opcao" data-area="${a}" aria-pressed="${s.area === a}">
@@ -286,6 +303,10 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
       el.querySelector('[data-falar]')?.addEventListener('click', e => ditar(e.currentTarget, nota));
       el.querySelectorAll('[data-dia]').forEach(b => b.onclick = () => { s.data = b.dataset.dia; redesenhar(); });
       el.querySelector('#outroDia')?.addEventListener('change', e => { if (e.target.value) { s.data = e.target.value; redesenhar(); } });
+      // O campo de data fica invisível sobre o chip: no Chrome, tocar nele não abre o calendário sozinho.
+      el.querySelector('#outroDia')?.addEventListener('click', e => {
+        try { e.target.showPicker(); } catch { /* sem showPicker: o navegador abre do jeito dele */ }
+      });
       el.querySelector('[data-salvar]').onclick = e => salvar(e.currentTarget);
     },
   };
@@ -323,7 +344,7 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
       area: s.area || undefined,
       humor: s.humor || undefined,
       marcadores: [...s.marcadores],
-      ...(TIPOS[s.tipo].gatilhos ? { gatilhos: [...s.gatilhos], ajudou: [...s.ajudou] } : {}),
+      ...(TIPOS[s.tipo].gatilhos ? { gatilhos: comOutro(s.gatilhos, s.outro.gat), ajudou: comOutro(s.ajudou, s.outro.aju) } : {}),
       nota: s.nota.trim() || undefined,
       foto: s.foto || undefined,
       data: s.data,
@@ -337,7 +358,15 @@ export function abrirRegistro({ tipo = null, humor = null, registro = null, pess
     await tracar(botao);
     palco.fechar();
     if (!registro) store.definirPessoaAtiva(s.pessoaId);
-    await celebrar(registro ? 'Atualizado' : 'Registrado!', pess().eu ? 'Mais um passo no seu caminho.' : `Mais um capítulo de ${pess().nome}.`);
+    // Com mais de uma pessoa: quem ainda não teve o dia registrado hoje vira atalho na comemoração.
+    const proxima = s.data === hojeISO()
+      ? store.pessoas.find(p => p.id !== s.pessoaId && !store.todosRegistros.some(x => x.pessoaId === p.id && x.data === s.data))
+      : null;
+    const acao = proxima && {
+      rotulo: proxima.eu ? 'E o seu dia?' : `E o dia de ${proxima.nome}?`,
+      aoTocar: () => { store.definirPessoaAtiva(proxima.id); abrirRegistro({ pessoaId: proxima.id, tipo: s.tipo === 'casa' ? 'casa' : null, aoSalvar }); },
+    };
+    await celebrar(registro ? 'Atualizado' : 'Registrado!', pess().eu ? 'Mais um passo no seu caminho.' : `Mais um capítulo de ${pess().nome}.`, acao);
     aoSalvar?.(r);
   }
 

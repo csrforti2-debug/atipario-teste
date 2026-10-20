@@ -202,7 +202,8 @@ export const store = {
 
   carregarExemplo() {
     const { perfil, registros, lembretes } = gerarExemplo(new Date());
-    estado = { ...vazio(), prefs: { ...estado.prefs, pessoaAtiva: perfil.pessoas[0].id }, perfil, registros, lembretes: lembretes || [] };
+    // prefs.exemplo: o app sabe que são dados fictícios (faixa no Início, nada vai para a conta).
+    estado = { ...vazio(), prefs: { ...estado.prefs, pessoaAtiva: perfil.pessoas[0].id, exemplo: true }, perfil, registros, lembretes: lembretes || [] };
     return gravar();
   },
 

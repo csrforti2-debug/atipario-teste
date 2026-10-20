@@ -95,6 +95,48 @@
   font-weight: 700; font-size: 16px;
 }
 
+/* ---------- pessoa: avatar com a cor de cada uma ---------- */
+.avatar-pessoa {
+  --tam: 40px;
+  width: var(--tam); height: var(--tam); flex: none; border-radius: 50%;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--cor) 18%, var(--surface));
+  color: color-mix(in srgb, var(--cor) 70%, var(--ink));
+  font-family: var(--fonte-titulo); font-weight: 600; font-size: calc(var(--tam) * .48); line-height: 1;
+}
+
+/* Início com 2+ pessoas: quem está ativo, e o atalho para trocar */
+.trocar-pessoa {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px;
+  padding: 8px 12px 8px 8px; border-radius: 999px; text-align: left;
+  background: var(--surface); box-shadow: 0 0 0 1px var(--line);
+}
+.trocar-pessoa > span:nth-child(2) { flex: 1; display: grid; }
+.trocar-pessoa b { font-size: 17px; }
+.trocar-pessoa small { color: var(--ink-soft); font-size: 13px; }
+.trocar-pessoa-acao { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--primary-strong); }
+.trocar-pessoa:active { transform: scale(.98); }
+
+/* ---------- quem vamos registrar? ---------- */
+.quem { min-height: calc(100dvh - 130px); display: flex; flex-direction: column; justify-content: center; padding-top: 20px; }
+.quem-topo { display: flex; justify-content: center; margin-bottom: 18px; }
+.quem h1 { text-align: center; font-size: 30px; margin-bottom: 28px; }
+.quem-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.quem-cartao {
+  display: grid; justify-items: center; gap: 8px; padding: 22px 10px 16px;
+  border-radius: var(--r-xl); background: var(--surface); box-shadow: var(--sombra);
+  animation: aparece 380ms var(--ease) calc(var(--k) * 60ms) both;
+  transition: transform 180ms var(--ease), box-shadow 180ms;
+}
+.quem-cartao b { font-size: 18px; }
+.quem-cartao[aria-current="true"] { box-shadow: 0 0 0 2px var(--primary), var(--sombra); }
+.quem-cartao:active, .quem-cartao.escolhido { transform: scale(1.04); }
+.quem-status { font-size: 13px; color: var(--ink-faint); display: flex; align-items: center; gap: 4px; }
+.quem-status.feito { color: var(--primary-strong); font-weight: 700; }
+.quem-novo { background: transparent; box-shadow: none; border: 2px dashed var(--line); }
+.quem-mais { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; color: var(--ink-faint); background: var(--surface-2); }
+@media (prefers-reduced-motion: reduce) { .quem-cartao { animation: none; } }
+
 /* ---------- navegação inferior ---------- */
 #nav {
   position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
@@ -119,14 +161,21 @@
 }
 .nav-item[aria-current="page"] { color: var(--primary-strong); }
 .nav-item:active { transform: scale(.92); }
+/* O "+" leva um rótulo embaixo: sozinho, o ícone não dizia o que faz. */
+.nav-mais-item {
+  justify-self: center; align-self: stretch;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px;
+  padding: 0 0 13px; background: none; border: 0;
+  font: inherit; font-size: 11px; font-weight: 700; color: var(--primary-strong);
+}
 .nav-mais {
-  justify-self: center; width: 60px; height: 60px; margin-top: -28px;
+  width: 60px; height: 60px; margin-top: -28px;
   border-radius: 22px; display: grid; place-items: center;
   background: var(--primary); color: var(--primary-ink);
   box-shadow: 0 14px 28px -10px var(--primary), 0 0 0 6px var(--bg);
   transition: transform var(--medio) var(--ease);
 }
-.nav-mais:active { transform: scale(.94) rotate(90deg); }
+.nav-mais-item:active .nav-mais { transform: scale(.94) rotate(90deg); }
 
 /* ---------- folha que sobe de baixo ---------- */
 .folha-fundo {
@@ -210,6 +259,14 @@
 .bv-capa { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 18px; }
 .bv-capa h1 { font-size: 40px; }
 .bv-capa .palavra-marca { font-size: 26px; }
+.bv-capa h1 { margin-bottom: 0; }
+/* A resposta à dor do título: entra um instante depois dele. */
+.bv-resposta {
+  font-family: var(--fonte-titulo); font-weight: 600; font-size: 24px; line-height: 1.2;
+  color: var(--primary-strong); margin-top: -10px;
+  animation: aparece 420ms var(--ease) 250ms both;
+}
+@media (prefers-reduced-motion: reduce) { .bv-resposta { animation: none; } }
 
 .opcoes { display: grid; gap: 10px; }
 .opcao {
@@ -421,6 +478,8 @@
 .celebra--in .celebra-cartao { transform: none; opacity: 1; }
 .celebra-cartao b { font-family: var(--fonte-titulo); font-size: 22px; font-weight: 600; margin-top: 4px; }
 .celebra-cartao span { color: var(--ink-soft); font-size: 15px; }
+.celebra--acao .celebra-cartao { pointer-events: auto; }
+.celebra-acao { margin-top: 12px; }
 
 body.travado { overflow: hidden; }
 
@@ -485,6 +544,7 @@ body.travado { overflow: hidden; }
 
 .chips--grandes { gap: 10px; }
 .chips--grandes .chip { min-height: 50px; padding: 0 20px; font-size: 16px; }
+.campo-outro { margin-top: 12px; animation: aparece 220ms var(--ease) both; }
 
 .foto-grande {
   display: grid; justify-items: center; gap: 6px; padding: 34px 20px;

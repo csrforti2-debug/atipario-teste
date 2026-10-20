@@ -1,7 +1,7 @@
 {
   "name": "atipario",
   "short_name": "atipario",
-  "description": "O caminho de quem é atípico, registrado com poucos toques.",
+  "description": "Chega de recontar a história. O atipario lembra por você.",
   "lang": "pt-BR",
   "start_url": "./index.html",
   "display": "standalone",

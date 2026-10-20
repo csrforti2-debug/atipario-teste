@@ -28,6 +28,20 @@ export function ligarSeletor(el, aoTrocar) {
   });
 }
 
+// Cada pessoa ganha uma cor fixa (pela ordem de cadastro), usada no avatar e no cartão de escolha.
+const CORES = ['var(--primary)', 'var(--t-consulta)', 'var(--t-escola)', 'var(--t-casa)', 'var(--t-remedio)', 'var(--accent)'];
+export const corPessoa = id => CORES[Math.max(0, store.pessoas.findIndex(p => p.id === id)) % CORES.length];
+export const avatarPessoa = (p, tamanho = 40) =>
+  `<span class="avatar-pessoa" style="--cor:${corPessoa(p.id)};--tam:${tamanho}px" aria-hidden="true">${esc((p.nome[0] || '?').toUpperCase())}</span>`;
+
+/** Com 2 ou mais pessoas, o app abre perguntando de quem é a vez (uma vez por visita). */
+const CHAVE_ESCOLHA = 'atipario-escolheu';
+export const precisaEscolher = () => {
+  if (store.pessoas.length < 2) return false;
+  try { return !sessionStorage.getItem(CHAVE_ESCOLHA); } catch { return false; }
+};
+export const marcarEscolha = () => { try { sessionStorage.setItem(CHAVE_ESCOLHA, '1'); } catch { /* sem sessionStorage: segue */ } };
+
 export const rotuloPessoa = p => (p.eu ? `${p.nome} (você)` : p.nome) + (p.idade ? ` · ${p.idade} anos` : '');
 
 /**

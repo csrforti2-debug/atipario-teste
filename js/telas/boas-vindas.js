@@ -3,7 +3,7 @@
 // Dá para acompanhar mais de uma pessoa: depois de cada uma, pergunta se tem mais alguém.
 
 import { store } from '../store.js';
-import { APP, RELACOES, AREAS } from '../config.js';
+import { APP, RELACOES, AREAS, FASE_DE_TESTE } from '../config.js';
 import { logo } from '../marca.js';
 import { icone } from '../icones.js';
 import { esc } from '../ui.js';
@@ -47,10 +47,12 @@ export function render(el, { ir }) {
       <div class="bv-capa">
         ${logo({ tamanho: 92, animado: true, espessura: 5.5 })}
         <div class="palavra-marca">${APP.nome}</div>
-        <h1>Tudo o que acontece, num lugar só.</h1>
-        <p class="bv-sub">Terapias, escola, remédios e o dia a dia, registrados em poucos toques.
-          Quando precisar, vira um resumo pronto para mandar à equipe.</p>
-        ${conta.situacao.disponivel === false ? '<p class="bv-aviso">Versão de teste. Seus registros ficam só neste aparelho. Se preferir, use nomes de mentira.</p>' : ''}
+        <h1>Chega de recontar a história.</h1>
+        <p class="bv-resposta">O ${APP.nome} lembra por você.</p>
+        <p class="bv-sub">Terapias, consultas, remédios, escola e documentos, em poucos toques.
+          Lembrete na hora certa, resumo pronto na consulta.</p>
+        ${conta.situacao.disponivel === false ? '<p class="bv-aviso">Versão de teste. Seus registros ficam só neste aparelho. Se preferir, use nomes de mentira.</p>'
+          : FASE_DE_TESTE && conta.situacao.disponivel ? '<p class="bv-aviso">Versão de teste. Se preferir, use nomes de mentira.</p>' : ''}
       </div>
       <div class="pe-fixo">
         <button class="btn btn-primario btn-bloco" data-av>${APP.convite}</button>

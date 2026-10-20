@@ -1,9 +1,9 @@
-// CONTA — entrar, criar conta e cuidar da conta. Opcional: o app funciona sem isso.
+// CONTA — entrar, criar conta, senha nova e cuidar da conta. Opcional: o app funciona sem isso.
 // Criar conta exige consentimento específico (dado de saúde e de criança) e, separado,
 // o convite opcional para a pesquisa. Texto do termo: TERMO em js/config.js.
 
 import { store } from '../store.js';
-import { TERMO, APP } from '../config.js';
+import { TERMO, APP, FASE_DE_TESTE } from '../config.js';
 import { conta } from '../conta.js';
 import { icone } from '../icones.js';
 import { logo } from '../marca.js';
@@ -38,9 +38,11 @@ export function render(el, ctx) {
     const parar = conta.aoMudar(() => { parar(); redesenhar(); });
     return parar;
   }
-  // 3) com conta aberta
+  // 3) voltou pelo link de "esqueci minha senha"
+  if (conta.recuperando) return renderSenhaNova(el, ctx, topo, voltar);
+  // 4) com conta aberta
   if (s.logado) return renderConta(el, ctx, topo, voltar, redesenhar);
-  // 4) sem conta: entrar ou criar
+  // 5) sem conta: entrar ou criar
   return renderEntrada(el, ctx, topo, voltar, redesenhar);
 }
 
@@ -61,6 +63,7 @@ function renderEntrada(el, ctx, topo, voltar) {
       <p class="suave" style="margin:14px 0 18px">${criar
         ? 'Com uma conta, seus registros ficam guardados e você acessa de outro aparelho. É opcional.'
         : 'Entre para trazer seus registros guardados na conta.'}</p>
+      ${criar && FASE_DE_TESTE ? '<p class="bv-aviso" style="margin-bottom:14px">Versão de teste. Se preferir, use nomes de mentira.</p>' : ''}
 
       <form id="form" class="conta-form" novalidate>
         <label class="pergunta" for="email">E-mail</label>
@@ -82,6 +85,7 @@ function renderEntrada(el, ctx, topo, voltar) {
         <p class="conta-erro" role="alert" ${erro ? '' : 'hidden'}>${esc(erro)}</p>
         <button class="btn btn-primario btn-bloco" type="submit" id="enviar" ${criar ? 'disabled' : ''}>${criar ? 'Criar conta' : 'Entrar'}</button>
       </form>
+      ${criar ? '' : '<button class="btn btn-fantasma btn-bloco" type="button" data-esqueci style="margin-top:6px">Esqueci minha senha</button>'}
     </div>`;
 
     el.querySelector('[data-voltar]').onclick = voltar;
@@ -89,6 +93,7 @@ function renderEntrada(el, ctx, topo, voltar) {
     el.querySelector('[data-mostrar]').onclick = () => {
       const guardado = el.querySelector('#senha').value; mostrar = !mostrar; desenhar(); el.querySelector('#senha').value = guardado;
     };
+    el.querySelector('[data-esqueci]')?.addEventListener('click', () => abrirEsqueci(el.querySelector('#email').value.trim()));
     const botao = el.querySelector('#enviar');
     if (criar) {
       const confere = () => { botao.disabled = !(el.querySelector('#c-termo').checked && el.querySelector('#c-resp').checked); };
@@ -112,6 +117,67 @@ function renderEntrada(el, ctx, topo, voltar) {
       ctx.ir(store.perfil ? 'inicio' : 'boas-vindas');
     });
     el.querySelector('#email').focus();
+  }
+  desenhar();
+}
+
+// ---------------------------------------------------------------- esqueci minha senha
+function abrirEsqueci(emailDigitado) {
+  abrirFolha(`
+    <h3 class="folha-titulo">Esqueci minha senha</h3>
+    <p class="folha-texto">Digite o e-mail da conta. Mandamos um link para você criar uma senha nova.</p>
+    <input class="campo" id="r-email" type="email" inputmode="email" autocomplete="username" maxlength="254" value="${esc(emailDigitado)}">
+    <p class="conta-erro" role="alert" hidden></p>
+    <div class="folha-acoes">
+      <button class="btn btn-fantasma" data-n>Cancelar</button>
+      <button class="btn btn-primario" data-s>Mandar link</button>
+    </div>`, (f, fechar) => {
+    f.querySelector('[data-n]').onclick = fechar;
+    f.querySelector('[data-s]').onclick = async e => {
+      const email = f.querySelector('#r-email').value.trim();
+      if (!/^\S+@\S+\.\S+$/.test(email)) { const p = f.querySelector('.conta-erro'); p.textContent = 'Confira o e-mail.'; p.hidden = false; return; }
+      e.currentTarget.disabled = true;
+      await conta.recuperarSenha(email);
+      f.querySelector('.folha-texto').textContent = 'Se houver uma conta com esse e-mail, enviamos um link para criar uma senha nova. Confira também a caixa de spam.';
+      f.querySelector('.folha-acoes').innerHTML = '<button class="btn btn-primario" data-ok>Entendi</button>';
+      f.querySelector('#r-email').remove();
+      f.querySelector('[data-ok]').onclick = fechar;
+    };
+  });
+}
+
+// ---------------------------------------------------------------- senha nova
+function renderSenhaNova(el, ctx, topo, voltar) {
+  let mostrar = false;
+  function desenhar(erro = '') {
+    el.innerHTML = `
+    <div>${topo}
+      <h1 style="margin-top:8px">Crie uma senha nova</h1>
+      <p class="suave" style="margin:8px 0 18px">Pelo menos 8 caracteres.</p>
+      <form id="form" class="conta-form" novalidate>
+        <label class="pergunta" for="senha">Senha nova</label>
+        <div class="campo-com-botao">
+          <input class="campo" id="senha" type="${mostrar ? 'text' : 'password'}" autocomplete="new-password" required maxlength="128">
+          <button type="button" class="btn-icone" data-mostrar aria-label="${mostrar ? 'Esconder' : 'Mostrar'} a senha">${icone(mostrar ? 'x' : 'cadeado', 18)}</button>
+        </div>
+        <p class="conta-erro" role="alert" ${erro ? '' : 'hidden'}>${esc(erro)}</p>
+        <button class="btn btn-primario btn-bloco" type="submit" id="enviar">Salvar senha nova</button>
+      </form>
+    </div>`;
+    el.querySelector('[data-voltar]').onclick = voltar;
+    el.querySelector('[data-mostrar]').onclick = () => {
+      const guardado = el.querySelector('#senha').value; mostrar = !mostrar; desenhar(); el.querySelector('#senha').value = guardado;
+    };
+    el.querySelector('#form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const botao = el.querySelector('#enviar');
+      botao.disabled = true; botao.textContent = 'Um instante…';
+      const r = await conta.definirSenhaNova(el.querySelector('#senha').value);
+      if (!r.ok) return desenhar(r.dados.erro);
+      toast('Senha nova salva', 'check');
+      ctx.ir(store.perfil ? 'inicio' : 'boas-vindas');
+    });
+    el.querySelector('#senha').focus();
   }
   desenhar();
 }

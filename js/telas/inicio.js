@@ -4,11 +4,11 @@
 // O histórico completo mora na aba Histórico.
 
 import { store, nomePessoa, nomeDe, ehEu } from '../store.js';
-import { seletorPessoas, ligarSeletor } from '../pessoas.js';
+import { ligarSeletor, avatarPessoa } from '../pessoas.js';
 import { HUMOR, APP } from '../config.js';
 import { logo, rosto } from '../marca.js';
 import { icone } from '../icones.js';
-import { esc } from '../ui.js';
+import { esc, confirmar } from '../ui.js';
 import { hojeISO, diaISO, deISO } from '../datas.js';
 import { pontosCurva, tendencia } from '../analise.js';
 import { abrirRegistro } from '../fluxos/registro.js';
@@ -54,10 +54,21 @@ export function render(el, ctx) {
 
     <div class="ola">
       <h1>Oi, ${esc(perfil.quem.nome)}.</h1>
-      <p>${eu ? 'Seu caminho, um registro de cada vez.' : `Acompanhando ${esc(pessoa)}${store.pessoaAtiva?.idade ? `, ${esc(store.pessoaAtiva.idade)} anos` : ''}.`}</p>
+      ${store.pessoas.length > 1 ? `
+      <button class="trocar-pessoa" data-trocar aria-label="Trocar de pessoa">
+        ${avatarPessoa(store.pessoaAtiva, 40)}
+        <span><b>${esc(eu ? 'Você' : pessoa)}</b>${!eu && store.pessoaAtiva?.idade ? `<small>${esc(store.pessoaAtiva.idade)} anos</small>` : ''}</span>
+        <span class="trocar-pessoa-acao">${icone('troca', 16)} Trocar</span>
+      </button>` : `
+      <p>${eu ? 'Seu caminho, um registro de cada vez.' : `Acompanhando ${esc(pessoa)}${store.pessoaAtiva?.idade ? `, ${esc(store.pessoaAtiva.idade)} anos` : ''}.`}</p>`}
     </div>
 
-    ${seletorPessoas()}
+    ${store.prefs.exemplo ? `
+    <div class="faixa-exemplo">
+      <span><b>Dados de exemplo.</b> ${esc(listaNomes([perfil.quem.nome, ...store.pessoas.map(p => p.nome)]))} são fictícios.</span>
+      <button class="btn btn-secundario" data-do-zero>Começar do zero</button>
+    </div>` : ''}
+
 
     ${diaDeHoje ? `
     <button class="cartao hoje-feito" data-hoje>
@@ -112,6 +123,8 @@ export function render(el, ctx) {
   </div>`;
 
   ligarSeletor(el, redesenhar);
+  el.querySelector('[data-trocar]')?.addEventListener('click', () => ctx.ir('quem'));
+  el.querySelector('[data-do-zero]')?.addEventListener('click', () => comecarDoZero(ctx));
   el.querySelector('[data-dispensar-conta]')?.addEventListener('click', () => { store.definirPref('contaDispensada', true); redesenhar(); });
   el.querySelector('[data-perfil]').onclick = () => ctx.ir('perfil');
   el.querySelector('[data-sino]').onclick = () => ctx.ir('lembretes');
@@ -131,4 +144,18 @@ export function render(el, ctx) {
     setTimeout(() => abrirRegistro({ registro: r, intro: `Dia ${HUMOR[humor].toLowerCase()} registrado`, aoSalvar: redesenhar }), 260);
     setTimeout(redesenhar, 600);
   });
+}
+
+/** "Ana, Theo e Luísa" (sem repetir nomes). */
+const listaNomes = nomes => {
+  const l = [...new Set(nomes.filter(Boolean))];
+  return l.length > 1 ? `${l.slice(0, -1).join(', ')} e ${l[l.length - 1]}` : l[0] || '';
+};
+
+/** Sai dos dados de exemplo e volta às boas-vindas para começar com os dados de verdade. */
+export async function comecarDoZero(ctx) {
+  if (await confirmar({ titulo: 'Começar do zero?', texto: 'Os dados de exemplo saem do aparelho e você cadastra quem acompanha.', ok: 'Começar do zero' })) {
+    store.apagarTudo();
+    ctx.ir('boas-vindas');
+  }
 }
